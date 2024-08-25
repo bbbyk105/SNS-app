@@ -6,5 +6,8 @@ function Home() {
     const {currentUser} = useContext(SessionContext);
 
     if (currentUser == null) return <Navigate replace to="/signin" />
+    return (
+        <div>this is home</div>
+    )
 }
 export default Home;
