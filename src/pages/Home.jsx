@@ -1,11 +1,16 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { SessionContext } from "../SessionProvider";
 import { Navigate } from "react-router-dom";
 import { SideMenu } from "../components/SIdeMenu";
 import { postRepository } from "../repositories/post";
 
+useEffect(() =>{
+    fetchPosts();
+}, []);
+
 function Home() {
     const [content, setContent] = useState('');
+    const [posts, setPosts] =useState([]);
     const { currentUser } = useContext(SessionContext);
 
     const createPost = async () => {
@@ -13,6 +18,11 @@ function Home() {
         console.log(post);
         setContent('');
     };
+
+    const fetchPosts = async () =>{
+        const posts = await postRepository.find();
+        setPosts(posts)
+    }
 
     if (currentUser == null) return <Navigate replace to="/signin" />
 
