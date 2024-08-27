@@ -31,6 +31,7 @@ export const authRepository = {
         // sessionオブジェクトからuserを直接取り出し、emailも含めて返す
         const user = data.session.user;
         return {
+            id: user.id,
             email: user.email,  // emailを直接取得
             userName: user.user_metadata.name,  // userNameを取得
         };
