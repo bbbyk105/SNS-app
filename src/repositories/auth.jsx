@@ -11,6 +11,7 @@ export const authRepository = {
 
         return { ...data.user, userName: data.user.user_metadata.name };
     },
+
     async signin(email, password) {
         const { data, error } = await supabase.auth.signInWithPassword({
             email,
@@ -23,6 +24,7 @@ export const authRepository = {
             userName: data.user.user_metadata.name,
         };
     },
+
     async getCurrentUser() {
         const { data, error } = await supabase.auth.getSession();
         if (error) throw new Error(error.message);
@@ -35,5 +37,13 @@ export const authRepository = {
             email: user.email,  // emailを直接取得
             userName: user.user_metadata.name,  // userNameを取得
         };
-    }
+    },
+
+    async signout() {
+        const {error} = await supabase.auth.signOut();
+        if (error) throw new Error(error.message);
+        return true;
+        
+    },
+
 };

@@ -1,18 +1,59 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { SessionContext } from "../SessionProvider";
 import { Navigate } from "react-router-dom";
 import { SideMenu } from "../components/SIdeMenu";
 import { postRepository } from "../repositories/post";
+import { Post } from "../components/Post";
+import { Pagination } from "../components/Pagination";
+import { authRepository } from "../repositories/auth";
+
+
+const limit = 5;
 
 function Home() {
     const [content, setContent] = useState('');
-    const { currentUser } = useContext(SessionContext);
+    const [posts, setPosts] =useState([]);
+    const [page, setPage] =useState(1);
+    const { currentUser, setCurrentUser } = useContext(SessionContext);
+
+    useEffect(() =>{
+        fetchPosts();
+    },[]);
 
     const createPost = async () => {
         const post = await postRepository.create(content, currentUser.id);
-        console.log(post);
+        setPosts([
+            {...post, userId: currentUser.id, userName: currentUser.userName},
+            ...posts,
+        ]);
         setContent('');
     };
+
+    const fetchPosts = async (page) =>{
+        const posts = await postRepository.find(page, limit);
+        setPosts(posts)
+    };
+
+    const moveToNext = async () =>{
+        const nextPage = page + 1;
+        await fetchPosts(nextPage);
+        setPage(nextPage);
+    };
+    const moveToPrev = async () =>{
+        const prevPage = page - 1;
+        await fetchPosts(prevPage);
+        setPage(prevPage);
+    };
+
+    const deletePost = async(postId) =>{
+        await postRepository.delete(postId);
+        setPosts(posts.filter((post)=> post.id !== postId));
+    };
+
+    const signout = async () =>{
+        await authRepository.signout();
+        setCurrentUser(null);
+    }
 
     if (currentUser == null) return <Navigate replace to="/signin" />
 
@@ -21,7 +62,7 @@ function Home() {
             <header className="bg-[#34D399] p-4">
                 <div className="container mx-auto flex items-center justify-between">
                     <h1 className="text-3xl font-bold text-white">SNS APP</h1>
-                    <button className="text-white hover:text-red-600">ログアウト</button>
+                    <button className="text-white hover:text-red-600" onClick={signout}>ログアウト</button>
                 </div>
             </header>
             <div className="container mx-auto mt-6 p-4">
@@ -43,7 +84,15 @@ function Home() {
                                 Post
                             </button>
                         </div>
-                        <div className="mt-4"></div>
+                        <div className="mt-4">
+                            {posts.map((post) => (
+                            <Post key={post.id} post={post} onDelete={deletePost}/>
+                            ))}
+                        </div>
+                        <Pagination 
+                        onPrev={page > 1 ? moveToPrev : null} 
+                        onNext={posts.length >= limit ? moveToNext : null}
+                        />
                     </div>
                     <SideMenu />
                 </div>
