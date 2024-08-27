@@ -9,6 +9,7 @@ import { authRepository } from './repositories/auth';
     useEffect(() =>{
         setSession();
     },[]);
+    
     const setSession = async () =>{
         const currentUser = await authRepository.getCurrentUser();
         setCurrentUser(currentUser);
