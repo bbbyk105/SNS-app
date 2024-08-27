@@ -5,20 +5,14 @@ const SessionContext = createContext();
 
 const SessionProvider = (props) => {
     const [currentUser, setCurrentUser] = useState();
-    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         setSession();
-    }, [setSession]); // setSessionを依存関係に追加
-
+    }, []);
+    
     const setSession = async () => {
         const currentUser = await authRepository.getCurrentUser();
         setCurrentUser(currentUser);
-        setIsLoading(false);
-    }
-
-    if (isLoading) {
-        return <div>Loading...</div>; // ロード中のメッセージやスピナーを表示
     }
 
     return (
@@ -29,3 +23,4 @@ const SessionProvider = (props) => {
 };
 
 export { SessionContext, SessionProvider };
+
