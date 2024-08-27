@@ -1,25 +1,31 @@
 import { createContext, useEffect, useState } from 'react';
 import { authRepository } from './repositories/auth';
 
- const SessionContext = createContext();
- const SessionProvider = (props) => {
-    const [currentUser, setCurrentUser] = useState();
-    const [setIsLoading] =useState(true);
+const SessionContext = createContext();
 
-    useEffect(() =>{
+const SessionProvider = (props) => {
+    const [currentUser, setCurrentUser] = useState();
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
         setSession();
-    },[]);
-    
-    const setSession = async () =>{
+    }, [setSession]); // setSessionを依存関係に追加
+
+    const setSession = async () => {
         const currentUser = await authRepository.getCurrentUser();
         setCurrentUser(currentUser);
         setIsLoading(false);
     }
 
-    return (<SessionContext.Provider value ={{currentUser, setCurrentUser}}>
-        {props.children}
-    </SessionContext.Provider>
-    );
- };
+    if (isLoading) {
+        return <div>Loading...</div>; // ロード中のメッセージやスピナーを表示
+    }
 
- export {SessionContext, SessionProvider};
+    return (
+        <SessionContext.Provider value={{ currentUser, setCurrentUser }}>
+            {props.children}
+        </SessionContext.Provider>
+    );
+};
+
+export { SessionContext, SessionProvider };
