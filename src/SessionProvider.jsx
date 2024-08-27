@@ -4,7 +4,7 @@ import { authRepository } from './repositories/auth';
  const SessionContext = createContext();
  const SessionProvider = (props) => {
     const [currentUser, setCurrentUser] = useState();
-    const [isLoading, setIsLoading] =useState(true);
+    const [setIsLoading] =useState(true);
 
     useEffect(() =>{
         setSession();
