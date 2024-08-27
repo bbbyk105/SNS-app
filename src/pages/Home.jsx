@@ -3,26 +3,32 @@ import { SessionContext } from "../SessionProvider";
 import { Navigate } from "react-router-dom";
 import { SideMenu } from "../components/SIdeMenu";
 import { postRepository } from "../repositories/post";
+import { Post } from "../components/Post";
 
-useEffect(() =>{
-    fetchPosts();
-}, []);
+
 
 function Home() {
     const [content, setContent] = useState('');
     const [posts, setPosts] =useState([]);
     const { currentUser } = useContext(SessionContext);
 
+    useEffect(() =>{
+        fetchPosts();
+    },[]);
+
     const createPost = async () => {
         const post = await postRepository.create(content, currentUser.id);
-        console.log(post);
+        setPosts([
+            {...post, userId: currentUser.id, userName: currentUser.userName},
+            ...posts,
+        ]);
         setContent('');
     };
 
     const fetchPosts = async () =>{
         const posts = await postRepository.find();
         setPosts(posts)
-    }
+    };
 
     if (currentUser == null) return <Navigate replace to="/signin" />
 
@@ -53,7 +59,11 @@ function Home() {
                                 Post
                             </button>
                         </div>
-                        <div className="mt-4"></div>
+                        <div className="mt-4">
+                            {posts.map((post) => (
+                            <Post key={post.id} post={post}/>
+                            ))}
+                        </div>
                     </div>
                     <SideMenu />
                 </div>
